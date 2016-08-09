@@ -20,13 +20,13 @@ const lastWheel$ = wheel$
 // Down
 const down$ = wheel$
     .filter(e => e.deltaY > 0)
-    .throttle(e => lastWheel$.race(endAnimation$))
+    .throttle(e => lastWheel$)
     .share();
 
 // Up
 const up$ = wheel$
     .filter(e => e.deltaY < 0)
-    .throttle(e => lastWheel$.race(endAnimation$))
+    .throttle(e => lastWheel$)
     .share();
 
 down$.subscribe(() => {
@@ -41,11 +41,13 @@ down$.subscribe(() => {
 
 up$.subscribe(() => {
     $('body').stop().animate({
-        scrollTop: `-=${$(window).height()}`
-    }, {
-        duration: 750,
-        easing: 'easeOutExpo'
-    }, () => endAnimation$.next());
+            scrollTop: `-=${$(window).height()}`
+        }, {
+            duration: 750,
+            easing: 'easeOutExpo',
+            complete: () => endAnimation$.next(),
+        }
+    );
 });
 
 
