@@ -2,10 +2,11 @@
   "name": "rx-wheel",
   "version": "0.0.0",
   "description": "A small test to make a wheel navigation on sections thanks RxJS",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:local": "webpack -w"
+    "build:local": "webpack -w",
+    "build:prod": "babel src/index.js --out-file dist/index.js"
   },
   "repository": {
     "type": "git",
@@ -17,17 +18,13 @@
     "url": "https://github.com/seracio/rx-wheel/issues"
   },
   "homepage": "https://github.com/seracio/rx-wheel#readme",
-  "dependencies": {
-    "babel-polyfill": "^6.13.0",
-    "jquery": "^3.1.0",
-    "jquery-ui": "^1.12.0",
-    "rxjs": "^5.0.0-beta.10"
-  },
   "devDependencies": {
-    "babel-core": "^6.13.2",
-    "babel-loader": "^6.2.4",
-    "babel-preset-es2015": "^6.13.2",
-    "webpack": "^1.13.1",
-    "webpack-dev-server": "^1.14.1"
+    "babel-cli": "6.11.4",
+    "babel-core": "6.13.2",
+    "babel-loader": "6.2.4",
+    "babel-polyfill": "6.13.0",
+    "babel-preset-es2015": "6.13.2",
+    "rxjs": "5.0.0-beta.10",
+    "webpack": "1.13.1"
   }
 }
