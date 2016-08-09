@@ -1,6 +1,6 @@
 {
   "name": "rx-wheel",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A small test to make a wheel navigation on sections thanks RxJS",
   "main": "dist/index.js",
   "scripts": {
