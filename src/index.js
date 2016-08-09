@@ -1,28 +1,59 @@
-const {Observable} = Rx;
+import {Observable} from 'rxjs/Rx';
 
-const wheelEvent$ = Observable
+// Return deltaY (speed)
+const wheel$ = Observable
     .fromEvent(document, 'onwheel' in document ? 'wheel' : 'mousewheel')
-    .map(e => e.deltaY)
+    .map(e => ({
+        y: e.deltaY,
+    }))
     .filter(val => val !== 0)
     .share();
 
-const direction$ = wheelEvent$
-    .map(dy => dy > 0 ? 'down' : 'up')
+// We compute energy diff between each
+// wheel event
+const energyDiff$ = wheel$
+    .map(val => Math.abs(val.y, 2))
+    .scan((seed, val) => {
+        return {
+            prec: val,
+            e: val - seed.prec
+        }
+    }, {prec: 0})
+    .map(val => val.e)
     .share();
 
-const directionChange$ = direction$
+// Try to catch energy pick
+// then throttle
+// to avoid too many picks
+const energyPick$ = energyDiff$
+    .filter(val => val > 10)
+    .throttleTime(150)
+    .share();
+
+// compute direction changes
+const direction$ = wheel$
+    .map(val => val.y > 0 ? 'down' : 'up')
     .distinctUntilChanged()
     .share();
 
-const wheelEventEnd$ = wheelEvent$
-    .debounceTime(50)
+const final$ = energyPick$.withLatestFrom(
+    direction$,
+    (energy, direction) => ({
+        energy, direction
+    })
+)
     .share();
 
-const sameDirectionBuffer$ = wheelEvent$
-    .buffer(directionChange$.merge(wheelEventEnd$))
-    .filter(val => val.length > 0)
-    .share();
+final$.subscribe(val => {
+    $('body')
+        .animate(
+            {
+                scrollTop: (val.direction === 'up' ? '-=' : '+=') + $(window).height()
+            }, {
+                duration: 500,
+                easing: 'easeOutQuart'
+            }
+        );
+});
 
-directionChange$.subscribe(val => console.log(val));
 
-wheelEventEnd$.subscribe(val => console.log('end'));
