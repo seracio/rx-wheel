@@ -1,6 +1,8 @@
 # rx-wheel
 
-A small higher-order function returning an RxJS Observable that emits at the start of a `wheel` event and try to deal with OSX inertia  
+A small higher-order function returning an RxJS Observable that emits at the start of a `wheel` event and try to deal with OSX inertia
+  
+[demo]  
 
 ## Usage
 
@@ -38,3 +40,5 @@ npm run build:local
 ```
 npm run build:prod
 ```
+
+[demo]: https://seracio.github.io/rx-wheel/
