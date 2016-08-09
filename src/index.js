@@ -1,54 +1,28 @@
-import $ from 'jquery';
-import {Observable, Subject} from 'rxjs/Rx';
+const {Observable} = Rx;
 
-// All wheel events
-// We do a prevent default on each one
-const wheel$ = Observable
-    .fromEvent(document.querySelector('body'), 'wheel')
-    .do(e => e.preventDefault())
+const wheelEvent$ = Observable
+    .fromEvent(document, 'onwheel' in document ? 'wheel' : 'mousewheel')
+    .map(e => e.deltaY)
+    .filter(val => val !== 0)
     .share();
 
-// A Subject to catch the end of an animation
-//  Don't know if this is necessary
-const endAnimation$ = new Subject();
+const direction$ = wheelEvent$
+    .map(dy => dy > 0 ? 'down' : 'up')
+    .share();
 
-// Catch last wheel event
-const lastWheel$ = wheel$
+const directionChange$ = direction$
+    .distinctUntilChanged()
+    .share();
+
+const wheelEventEnd$ = wheelEvent$
     .debounceTime(50)
     .share();
 
-// Down
-const down$ = wheel$
-    .filter(e => e.deltaY > 0)
-    .throttle(e => lastWheel$)
+const sameDirectionBuffer$ = wheelEvent$
+    .buffer(directionChange$.merge(wheelEventEnd$))
+    .filter(val => val.length > 0)
     .share();
 
-// Up
-const up$ = wheel$
-    .filter(e => e.deltaY < 0)
-    .throttle(e => lastWheel$)
-    .share();
+directionChange$.subscribe(val => console.log(val));
 
-down$.subscribe(() => {
-    $('body').stop().animate({
-        scrollTop: `+=${$(window).height()}`
-    }, {
-        duration: 750,
-        easing: 'easeOutExpo'
-    }, () => endAnimation$.next());
-});
-
-
-up$.subscribe(() => {
-    $('body').stop().animate({
-            scrollTop: `-=${$(window).height()}`
-        }, {
-            duration: 750,
-            easing: 'easeOutExpo',
-            complete: () => endAnimation$.next(),
-        }
-    );
-});
-
-
-
+wheelEventEnd$.subscribe(val => console.log('end'));
